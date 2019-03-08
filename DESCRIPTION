@@ -1,11 +1,11 @@
 Package: runner
 Title: Running Operations for Vectors
 Type: Package
-Version: 0.1.0
+Version: 0.2.0
 Depends: R (>= 3.0)
 Authors@R: person("Dawid", "Kałędkowski", email = "dawid.kaledkowski@gmail.com", role = c("aut", "cre"))
 Maintainer: Dawid Kałędkowski <dawid.kaledkowski@gmail.com>
-Description: Package contains running functions (a.k.a. windowed, rolling, cumulative) 
+Description: Calculates running functions (a.k.a. windowed, rolling, cumulative) 
   with varying window size and missing handling options. Package brings also 
   running streak and running which, what extends beyond range of functions 
   already implemented in R packages.
@@ -18,7 +18,7 @@ RoxygenNote: 6.1.0
 Suggests: testthat, covr, knitr, rmarkdown, magrittr
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2018-08-26 08:59:37 UTC; dkaledkowski
+Packaged: 2019-03-07 21:16:48 UTC; gonzo
 Author: Dawid Kałędkowski [aut, cre]
 Repository: CRAN
-Date/Publication: 2018-08-31 18:50:03 UTC
+Date/Publication: 2019-03-08 13:40:03 UTC

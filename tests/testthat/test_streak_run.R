@@ -1,4 +1,5 @@
 context("Streak Length")
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(11)
 x1 <- sample(c("a","b"),15,replace=T)
 x2 <- sample(c(NA_character_,"a","b"),15,replace=T)
@@ -53,6 +54,16 @@ test_that("streak_run handles NA's", {
     as.integer(c(NA,NA,2,1,1,1,1,1,2,2,2,2,2,1,1))
   )
 })
+
+test_that("sum_run with idx++ same as sum_run with windows",{
+  expect_identical( streak_run(x1,k=3) , streak_run(x1,k=3, idx=1:15) )
+  expect_identical( streak_run(x1,k=k1) , streak_run(x1,k=k1, idx=1:15) )
+
+
+  expect_identical( streak_run(as.factor(x1),k=3) , streak_run(as.factor(x1),k=3, idx=1:15) )
+  expect_identical( streak_run(as.factor(x1),k=k1), streak_run(as.factor(x1),k=k1, idx=1:15) )
+})
+
 
 test_that("Error in streak_run",{
   expect_error(streak_run(x1, k=c(2,2,2,2,NA,2,2)))

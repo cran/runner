@@ -4,7 +4,8 @@
 \alias{whicht_run}
 \title{Running which-true function}
 \usage{
-whicht_run(x, k = 0L, which = "last", na_rm = TRUE, na_pad = FALSE)
+whicht_run(x, k = 0L, which = "last", na_rm = TRUE, na_pad = FALSE,
+  idx = 0L)
 }
 \arguments{
 \item{x}{input logical vector where running which-true is calculated.}
@@ -16,6 +17,8 @@ whicht_run(x, k = 0L, which = "last", na_rm = TRUE, na_pad = FALSE)
 \item{na_rm}{logical (default \code{na_rm=TRUE}) - if \code{TRUE} \code{NA} are replaced by last observed minimum prior to element.}
 
 \item{na_pad}{logical (default \code{na_pad=FALSE}) - if \code{TRUE} first k-results will be filled by \code{NA}. If k is not specified na_pad=F by default.}
+
+\item{idx}{an optional integer vector containing indexes numbers of observation.}
 }
 \value{
 numeric vector of length equals length of \code{x} containing running index in \code{k}-long window.

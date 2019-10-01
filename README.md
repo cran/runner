@@ -2,10 +2,10 @@
 `runner` a R package for running operations.
 ============================================
 
-sport <img src="vignettes/images/hexlogo.png" align="right" />
-==============================================================
+<img src="vignettes/images/hexlogo.png" align="right" />
+========================================================
 
-[![Cran badge](https://www.r-pkg.org/badges/version/runner)](https://cran.r-project.org/web/packages/runner/index.html) [![Travis-CI Build Status](https://travis-ci.org/gogonzo/runner.svg?branch=master)](https://travis-ci.org/gogonzo/runner) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/gogonzo/runner?branch=master&svg=true)](https://ci.appveyor.com/project/gogonzo/runner) ![Coverage status](https://codecov.io/gh/gogonzo/runner/branch/master/graph/badge.svg)
+[![Cran badge](https://cranlogs.r-pkg.org/badges/runner)](https://CRAN.R-project.org/package=runner) [![Travis-CI Build Status](https://travis-ci.org/gogonzo/runner.svg?branch=master)](https://travis-ci.org/gogonzo/runner) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/gogonzo/runner?branch=master&svg=true)](https://ci.appveyor.com/project/gogonzo/runner) ![Coverage status](https://codecov.io/gh/gogonzo/runner/branch/master/graph/badge.svg)
 
 About
 -----
@@ -22,113 +22,44 @@ Install package from from github or from CRAN.
 install.packages("runner")
 ```
 
-Examples
---------
+Using runner
+------------
 
-The main idea of the package is to provide running operations on R vectors. Running functions are these which are applied to all elements up to actual one. For example implemented already in `base` `cumsum`, `cummin` etc. Functions provided in this package works similar but with extended functionality such as handling `NA` and custom window size. The most functions provided in package are based on the same logic:
+The main idea of the package is to provide running operations on R vectors. Running functions are these which are applied to all elements up to actual one. For example implemented already in `base` `cumsum`, `cummin` etc. Functions provided in this package works similar but with extended functionality such as handling `NA`, custom window size. The most functions provided in package are based on the same logic:
 
--   window size `k` denotes number of elements from i-th backwards, where functions are calculated. `k` can be also specified by vector of the same length as x as illustrated in second example.
+![](vignettes/images/runner_api.png)
 
-![window size](vignettes/images/options_window_size.png)
+### fixed window size
 
-![window size](vignettes/images/options_window_size_varying.png)
+`k` denotes number of elements in window. For fixed window size `k` should be single value.
 
--   argument `na_rm=T` handling missing and is equivalent to `na.rm`.
+![](vignettes/images/options_window_size.png)
 
-![na\_rm](vignettes/images/options_na_rm.png)
+### Varying window size
+
+For varying window size `k` should be of the same length as `x`. Varying window size means that for element `[i]` function will be calculated on window of length `k[i]`.
+
+![](vignettes/images/options_window_size_varying.png)
+
+### Windows depending on date
+
+Sometimes data points in dataset are not equally spaced (missing weeekends, holidays, other missings) and thus window size should vary to keep expected time frame. If one specifies `idx` argument, than running functions are applied on windows depending on date. `idx` should be the same length as `x` of class `Date` or `integer`. Including `idx` can be combined with varying window size, than k will denote number of periods in window different for each data point.
+
+![](vignettes/images/options_idx.png)
+
+### Other options
+
+-   `na_rm = TRUE` handling missing and is equivalent to `na.rm`.
+
+![](vignettes/images/options_na_rm.png)
 
 -   `na_pad=T` if window size exceeds number of available elements, than first `k-1` elements are filled with `NA`.
 
-![na\_pad](vignettes/images/options_na_pad.png)
+![](vignettes/images/options_na_pad.png)
 
 -   `which` used with running index, which value ('first' or 'last')
 
-![first or last](vignettes/images/options_which_first_last.png)
-
--   `idx` to calculate within time window. `idx` is a date (or numeric) vector of the same length as x. `k` then should to be an integer specyfying time window span. In the example k=5 window sum.
-
-![idx](vignettes/images/options_idx.png)
-
-### Creating windows
-
-Function creates list of windows. Because `runner` provide limited functionality, one can create running-window-list which can be further processed by user to obtain desired statistic (eg. window sum). `x` is a vector to be 'run on' and `k` is a length of window. In this example window length is varying as specified by `k`. Provide one value to obtain constant window size.
-
-``` r
-library(runner); library(magrittr)
-set.seed(11)
-window_run( x = 1:5, k = c(1,2,3,3,2) )
-#> [[1]]
-#> [1] 1
-#> 
-#> [[2]]
-#> [1] 1 2
-#> 
-#> [[3]]
-#> [1] 1 2 3
-#> 
-#> [[4]]
-#> [1] 2 3 4
-#> 
-#> [[5]]
-#> [1] 4 5
-```
-
-Such windows can be used in further calculations, with any R function. Example below shows how to obtain running `sum` in specified, varying window length (specified by `k`).
-
-``` r
-window_run( x= 1:5, k = c(1,2,3,3,2) ) %>%
-  lapply(sum) %>%
-  unlist
-#> [1] 1 3 6 9 9
-```
-
-One can also specify window based on a date of other numeric index. To do this date should be passed via `idx` argument and k should be integer denoting date-window span.
-
-``` r
-window_run( x = 1:5, k = 3, idx = c(1,2,5,6,7) ) 
-#> [[1]]
-#> [1] 1
-#> 
-#> [[2]]
-#> [1] 1 2
-#> 
-#> [[3]]
-#> [1] 3
-#> 
-#> [[4]]
-#> [1] 3 4
-#> 
-#> [[5]]
-#> [1] 3 4 5
-```
-
-### Unique elements in window
-
-User can use `unique_run` create list of unique elements within specified window size.
-
-``` r
-x2 <- sample( letters[1:3], 6, replace=TRUE)
-x2 
-#> [1] "a" "a" "b" "a" "a" "c"
-unique_run( x=x2, k = 3 )
-#> [[1]]
-#> [1] "a"
-#> 
-#> [[2]]
-#> [1] "a"
-#> 
-#> [[3]]
-#> [1] "a" "b"
-#> 
-#> [[4]]
-#> [1] "a" "b"
-#> 
-#> [[5]]
-#> [1] "b" "a"
-#> 
-#> [[6]]
-#> [1] "c" "a"
-```
+![](vignettes/images/options_which_first_last.png)
 
 ### Running aggregations `(mean|sum|min|max)_run`
 
@@ -137,6 +68,9 @@ Runner provides basic aggregation methods calculated within running windows. Bel
 ![running minimum](vignettes/images/running_minimum.png)
 
 ``` r
+library(runner)
+library(magrittr)
+
 x <- c(1,-5,1,-3,NA,NA,NA,1,-1,NA,-2,3)
 k <- c(4,5,2,5,4,4,2,2,4,4,3,1)
 idx <- c(1,3,4,6,7,10,13,16,19,21,23,26)
@@ -247,5 +181,129 @@ data.frame(
 #> 12 FALSE  1 NA  9
 ```
 
-Custom indexes
---------------
+### Unique elements in window
+
+User can use `unique_run` create list of unique elements within specified window size.
+
+``` r
+x2 <- sample( letters[1:3], 6, replace=TRUE)
+x2 
+#> [1] "c" "c" "c" "c" "c" "c"
+unique_run( x=x2, k = 3 )
+#> [[1]]
+#> [1] "c"
+#> 
+#> [[2]]
+#> [1] "c"
+#> 
+#> [[3]]
+#> [1] "c"
+#> 
+#> [[4]]
+#> [1] "c"
+#> 
+#> [[5]]
+#> [1] "c"
+#> 
+#> [[6]]
+#> [1] "c"
+```
+
+Apply custom function
+---------------------
+
+### Own runner
+
+One can use own function with function `runner` which will be applied in the same way as other build-in functions.
+
+![](vignettes/images/custom_runner.png)
+
+Below example of using `base::mean` inside of the `runner` function.
+
+``` r
+x <- runif(15)
+k <- sample(1:15, 15, replace = TRUE)
+idx <- cumsum(sample(c(1,2,3,4), 15, replace=T))
+
+# simple call
+simple_mean <- runner(x = x, k = 4, f = mean)
+
+# additional arguments for mean
+trimmed_mean <- runner(x = x, k = 4, f = function(x) mean(x, trim = 0.05))
+
+# varying window size
+varying_window <- runner(x = x, k = k, f = function(x) mean(x, trim = 0.05))
+
+# date windows
+date_windows <- runner(x = x, k = k, idx = idx, f = function(x) mean(x, trim = 0.05))
+
+data.frame(x, k, idx, simple_mean, trimmed_mean, varying_window, date_windows)
+#>            x  k idx simple_mean trimmed_mean varying_window date_windows
+#> 1  0.9045468 14   1   0.9045468    0.9045468      0.9045468    0.9045468
+#> 2  0.3912330  4   5   0.6478899    0.6478899      0.6478899    0.3912330
+#> 3  0.1205684  7   9   0.4721161    0.4721161      0.4721161    0.2559007
+#> 4  0.7689856  7  10   0.5463335    0.5463335      0.5463335    0.4269290
+#> 5  0.8541224  8  13   0.5337274    0.5337274      0.6078912    0.5812255
+#> 6  0.8253508  6  14   0.6422568    0.6422568      0.6441345    0.6422568
+#> 7  0.4720555  1  18   0.7301286    0.7301286      0.4720555    0.4720555
+#> 8  0.8347993  3  21   0.7465820    0.7465820      0.7107352    0.8347993
+#> 9  0.6623278  6  23   0.6986334    0.6986334      0.7362736    0.6563942
+#> 10 0.6543098  1  26   0.6558731    0.6558731      0.6543098    0.6543098
+#> 11 0.1847041  2  28   0.5840353    0.5840353      0.4195069    0.1847041
+#> 12 0.1445083 13  31   0.4114625    0.4114625      0.5681260    0.4961299
+#> 13 0.5277289  7  34   0.3778128    0.3778128      0.4972048    0.2856471
+#> 14 0.7697875 12  35   0.4066822    0.4066822      0.5682707    0.4562077
+#> 15 0.9685401  5  39   0.6026412    0.6026412      0.5190538    0.8691638
+```
+
+### Creating windows
+
+Function creates list of windows. Because `runner` provide limited functionality, one can create running-window-list which can be further processed by user to obtain desired statistic (eg. window sum). `x` is a vector to be 'run on' and `k` is a length of window. In this example window length is varying as specified by `k`. Provide one value to obtain constant window size.
+
+``` r
+set.seed(11)
+window_run(x = 1:5, k = c(1,2,3,3,2) )
+#> [[1]]
+#> [1] 1
+#> 
+#> [[2]]
+#> [1] 1 2
+#> 
+#> [[3]]
+#> [1] 1 2 3
+#> 
+#> [[4]]
+#> [1] 2 3 4
+#> 
+#> [[5]]
+#> [1] 4 5
+```
+
+Such windows can be used in further calculations, with any R function. Example below shows how to obtain running `sum` in specified, varying window length (specified by `k`).
+
+``` r
+window_run( x= 1:5, k = c(1,2,3,3,2) ) %>%
+  lapply(sum) %>%
+  unlist
+#> [1] 1 3 6 9 9
+```
+
+One can also specify window based on a date of other numeric index. To do this date should be passed via `idx` argument and k should be integer denoting date-window span.
+
+``` r
+window_run( x = 1:5, k = 3, idx = c(1,2,5,6,7) ) 
+#> [[1]]
+#> [1] 1
+#> 
+#> [[2]]
+#> [1] 1 2
+#> 
+#> [[3]]
+#> [1] 3
+#> 
+#> [[4]]
+#> [1] 3 4
+#> 
+#> [[5]]
+#> [1] 3 4 5
+```

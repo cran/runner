@@ -4,16 +4,25 @@
 \alias{length_run}
 \title{Length of running windows}
 \usage{
-length_run(k = 1L, idx = 0L)
+length_run(k = integer(1), lag = integer(1), idx = integer(0))
 }
 \arguments{
-\item{k}{integer vector which specifies window length}
+\item{k}{\code{integer} vector or single value denoting size of the running window. If \code{k} is a single
+value then window size is constant for all elements, otherwise if \code{length(k) == length(x)} different
+window size for each element.}
 
-\item{idx}{an optional integer vector containing index of observations.}
+\item{lag}{\code{integer} vector or single value denoting window lag. If \code{lag} is a single
+value then window lag is constant for all elements, otherwise if \code{length(lag) == length(x)} different
+window size for each element.}
+
+\item{idx}{\code{date or integer} an optional integer vector containing index of observation. If specified
+then \code{k} and \code{lag} are depending on \code{idx}. Length of \code{idx} should be equal of length \code{x}}
 }
 \description{
-Number of elements in k-long window calculated on idx vector. If idx is an `as.integer(date)` vector, then k=number of days in window - then the result is number of observations within k days window.
+Number of elements in k-long window calculated on idx vector.
+If idx is an `as.integer(date)` vector, then k=number of days in window -
+then the result is number of observations within k days window.
 }
 \examples{
-length_run(k=3,idx=c(1,2,2,4,5,5,5,5,5,5))
+length_run(k = 3, idx = c(1, 2, 2, 4, 5, 5, 5, 5, 5, 5))
 }

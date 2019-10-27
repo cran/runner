@@ -1,106 +1,299 @@
 context("Running max")
-suppressWarnings(RNGversion("3.5.0"))
 set.seed(11)
-x1 <- sample(c(1,2,3), 15, replace=T)
-x2 <- sample(c(NA,1,2,3), 15, replace=T)
-k  <- sample(1:15,15, replace=T)
-idx <- function(i,k)
-  ifelse( (i-k+1)<1,1,i-k+1)
+x1 <- sample(c(1, 2, 3), 100, replace = TRUE)
+x2 <- sample(c(NA, 1, 2, 3), 100, replace = TRUE)
+k <- sample(1:100, 100, replace = TRUE)
+lag <- sample(-15:15, 100, replace = TRUE)
+idx <- cumsum(sample(c(1, 2, 3, 4), 100, replace = TRUE))
+max2 <- function(x) {
+  if (all(is.na(x))) return(NA) else max(x, na.rm = TRUE)
+}
 
-test_that("max_run basic",{
-  for(i in 1:15)
-    expect_equal(
-      max_run(x1)[i] ,
-      max(x1[1:i])
-    )
-})
-
-test_that("max_run with na_rm=T", {
-  for(i in 1:15)
-    expect_equal(
-      max_run(x2, na_rm = T)[i] ,
-      max(x2[1:i], na.rm=T)
-    )
-})
-
-test_that("max_run with na_rm=F", {
-  for(i in 1:15)
-    expect_equal(
-      max_run(x2, na_rm = F )[i] ,
-      max(x2[1:i])
-    )
-})
-
-
-test_that("max_run with na_rm=T k=4", {
-  for(i in 1:15)
-    expect_equal(
-      max_run(x2, na_rm = T, k=4)[i] ,
-      max(x2[pmax(i-4+1,1):i], na.rm=T)
-    )
-})
-
-test_that("max_run with na_rm=F k=4", {
-  for(i in 1:15)
-    expect_equal(
-      max_run(x2, k=4, na_rm = F )[i] ,
-      max(x2[pmax(i-4+1,1):i], na.rm = F)
-    )
-})
-
-test_that("max_run pads NA's", {
+test_that("       |--------]------->", {
   expect_identical(
-    max_run( x2, na_pad=T,k=3 ),
-    c( NA,NA,2,1,1,1,2,2,2,1,1,1,1,1,1)
+    max_run(x2),
+    runner(x2, f = max2)
+  )
+
+  expect_identical(
+    max_run(x2, na_pad = TRUE),
+    runner(x2, f = max2, na_pad = TRUE)
   )
 })
 
-test_that("varying window", {
-  for(i in 1:10)
-    expect_equal(
-      max_run(x1,k=k)[i],
-      max(x1[idx(i,k[i]):i], na.rm=T)
-    )
+test_that("   [...|----]---+------->", {
+  expect_equal(
+    max_run(x2, lag = 3),
+    runner(x2, lag = 3, f = max2))
+
+  expect_equal(
+    max_run(x2, lag = 3, na_pad = TRUE),
+    runner(x2, lag = 3, f = max2, na_pad = TRUE))
+})
+
+test_that("       |--------+---]--->", {
+  expect_equal(
+    max_run(x2, lag = -3),
+    runner(x2, lag = -3, f = max2))
+
+  expect_equal(
+    max_run(x2, lag = -3, na_pad = TRUE),
+    runner(x2, lag = -3, f = max2, na_pad = TRUE))
+})
+
+test_that("  [...]|--------+------->", {
+  expect_equal(
+    max_run(x2, lag = 100),
+    runner(x2, lag = 100, f = max2))
+
+  expect_equal(
+    max_run(x2, lag = 100, na_pad = TRUE),
+    runner(x2, lag = 100, f = max2, na_pad = TRUE))
+
+
+  expect_equal(
+    max_run(x2, lag = -100),
+    runner(x2, lag = -100, f = max2))
+
+  expect_equal(
+    max_run(x2, lag = -100, na_pad = TRUE),
+    runner(x2, lag = -100, f = max2, na_pad = TRUE))
+})
+
+test_that("       |----[...]------->", {
+  expect_equal(
+    max_run(x2, k = 3),
+    runner(x2, k = 3, f = max2))
+
+  expect_equal(
+    max_run(x2, k = 3, na_pad = TRUE),
+    runner(x2, k = 3, f = max2, na_pad = TRUE))
 
 })
 
+test_that("       [...|--------+-------[...]", {
+  expect_equal(
+    max_run(x2, k = 1),
+    runner(x2, k = 1, f = max2))
 
-test_that("max_run with idx++ same as max_run with windows",{
-  expect_identical( max_run(x1,k=3) , max_run(x1,k=3, idx=1:15) )
-  expect_identical( max_run(x1,k=k) , max_run(x1,k=k, idx=1:15) )
+  expect_equal(
+    max_run(x2, k = 1, na_pad = TRUE),
+    runner(x2, k = 1, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, k = 99),
+    runner(x2, k = 99, f = max2))
+
+  expect_equal(
+    max_run(x2, k = 99, na_pad = TRUE),
+    runner(x2, k = 99, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, k = 100),
+    runner(x2, k = 100, f = max2))
+
+  expect_equal(
+    max_run(x2, k = 100, na_pad = TRUE),
+    runner(x2, k = 100, f = max2, na_pad = TRUE))
 })
 
-test_that("max_run with idx",{
-  x11 <- rep(NA, 15)
-  x22 <- rep(NA, 15)
-  idx <- cumsum(sample(c(1,2,3,4), 15, replace=T))
+test_that("       [...|----]---+------->", {
+  expect_equal(
+    max_run(x2, k = 5, lag = 3),
+    runner(x2, k = 5, lag = 3, f = max2))
 
-  for(i in 1:15)
-    for(j in i:1)
-      if(idx[j] >= (idx[i]-2)){
-        x11[i] <- max(x1[j:i])
-      } else {
-        break;
-      }
+  expect_equal(
+    max_run(x2, k = 5, lag = 3, na_pad = TRUE),
+    runner(x2, k = 5, lag = 3, f = max2, na_pad = TRUE))
 
+  expect_equal(
+    max_run(x2, k = 5, lag = 3, na_rm = FALSE),
+    runner(x2, k = 5, lag = 3, f = max))
 
-  for(i in 1:15)
-    for(j in i:1)
-      if(idx[j] >= (idx[i]-(k[i]-1))){
-        x22[i] <- max(x1[j:i])
-      } else {
-        break;
-      }
+  expect_equal(
+    max_run(x2, k = 5, lag = 3, na_pad = TRUE, na_rm = FALSE),
+    runner(x2, k = 5, lag = 3, f = max, na_pad = TRUE))
+})
 
-  expect_identical(max_run(x1, k=3, idx=idx), x11)
-  expect_identical(max_run(x1, k=k, idx=idx), x22)
+test_that("       |-----[--+---]--->", {
+  expect_equal(
+    max_run(x2, k = 5, lag = -3),
+    runner(x2, k = 5, lag = -3, f = max2))
+
+  expect_equal(
+    max_run(x2, k = 5, lag = -3, na_pad = TRUE),
+    runner(x2, k = 5, lag = -3, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, k = 5, lag = -3, na_rm = FALSE),
+    runner(x2, k = 5, lag = -3, f = max))
+
+  expect_equal(
+    max_run(x2, k = 5, lag = -3, na_pad = TRUE, na_rm = FALSE),
+    runner(x2, k = 5, lag = -3, f = max, na_pad = TRUE))
+})
+
+test_that("       |--------+-[---]->", {
+  expect_equal(
+    max_run(x2, k = 5, lag = -7),
+    runner(x2, k = 5, lag = -7, f = max2))
+
+  expect_equal(
+    max_run(x2, k = 5, lag = -7, na_pad = TRUE),
+    runner(x2, k = 5, lag = -7, f = max2, na_pad = TRUE))
 
 })
 
+test_that("       |--------+[]----->", {
+  expect_equal(
+    max_run(x2, k = 1, lag = -1),
+    runner(x2, k = 1, lag = -1, f = max2))
 
-test_that("Error handling in max_run",{
-  expect_error(max_run(x2, k=c(2,2,2,2,NA)))
-  expect_error(max_run(x2, k=c(2,2,2,2,2,2)))
+  expect_equal(
+    max_run(x2, k = 1, lag = -1, na_pad = TRUE),
+    runner(x2, k = 1, lag = -1, f = max2, na_pad = TRUE))
 })
 
+test_that("       |------[]+------->", {
+  expect_equal(
+    max_run(x2, k = 1, lag = 1),
+    runner(x2, k = 1, lag = 1, f = max2))
 
+  expect_equal(
+    max_run(x2, k = 1, lag = 1, na_pad = TRUE),
+    runner(x2, k = 1, lag = 1, f = max2, na_pad = TRUE))
+})
+
+test_that("various", {
+  expect_equal(
+    max_run(x2, k = k, lag = 1),
+    runner(x2, k = k, lag = 1, f = max2))
+
+  expect_equal(
+    max_run(x2, k = k, lag = 1, na_pad = TRUE),
+    runner(x2, k = k, lag = 1, f = max2, na_pad = TRUE))
+
+
+  expect_equal(
+    max_run(x2, k = 3, lag = lag),
+    runner(x2, k = 3, lag = lag, f = max2))
+
+  expect_equal(
+    max_run(x2, k = 3, lag = lag, na_pad = TRUE),
+    runner(x2, k = 3, lag = lag, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, k = k, lag = lag),
+    runner(x2, k = k, lag = lag, f = max2))
+
+  expect_equal(
+    max_run(x2, k = k, lag = lag, na_pad = TRUE),
+    runner(x2, k = k, lag = lag, f = max2, na_pad = TRUE))
+
+})
+
+test_that("date window", {
+  expect_equal(
+    max_run(x2, lag = 3, idx = idx, na_pad = FALSE),
+    runner(x2, lag = 3, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, lag = 3, idx = idx, na_pad = TRUE),
+    runner(x2, lag = 3, idx = idx, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, lag = -3, idx = idx, na_pad = FALSE),
+    runner(x2, lag = -3, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, lag = -3, idx = idx, na_pad = TRUE),
+    runner(x2, lag = -3, idx = idx, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, k = 3, idx = idx, na_pad = FALSE),
+    runner(x2, k = 3, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, k = 3, idx = idx, na_pad = TRUE),
+    runner(x2, k = 3, idx = idx, f = max2, na_pad = TRUE))
+
+
+  expect_equal(
+    max_run(x2, lag = -1, idx = idx, na_pad = FALSE),
+    runner(x2, lag = -1, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, lag = -1, idx = idx, na_pad = TRUE),
+    runner(x2, lag = -1, idx = idx, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, lag = 100, idx = idx, na_pad = FALSE),
+    runner(x2, lag = 100, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, lag = 100, idx = idx, na_pad = TRUE),
+    runner(x2, lag = 100, idx = idx, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, lag = -100, idx = idx, na_pad = FALSE),
+    runner(x2, lag = -100, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, lag = -100, idx = idx, na_pad = TRUE),
+    runner(x2, lag = -100, idx = idx, f = max2, na_pad = TRUE))
+
+
+  expect_equal(
+    max_run(x2, lag = lag, idx = idx, na_pad = FALSE),
+    runner(x2, lag = lag, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, lag = lag, idx = idx, na_pad = TRUE),
+    runner(x2, lag = lag, idx = idx, f = max2, na_pad = TRUE))
+
+  expect_equal(
+    max_run(x2, k = 3, lag = 4, idx = idx, na_pad = FALSE),
+    runner(x2, k = 3, lag = 4, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, k = 3, lag = 4, idx = idx, na_pad = TRUE),
+    runner(x2, k = 3, lag = 4, idx = idx, f = max2, na_pad = TRUE))
+
+
+  expect_equal(
+    max_run(x2, k = 3, lag = -4, idx = idx, na_pad = FALSE),
+    runner(x2, k = 3, lag = -4, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, k = 3, lag = -4, idx = idx, na_pad = TRUE),
+    runner(x2, k = 3, lag = -4, idx = idx, f = max2, na_pad = TRUE))
+
+
+  expect_equal(
+    max_run(x2, k = k, lag = -4, idx = idx, na_pad = FALSE),
+    runner(x2, k = k, lag = -4, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, k = k, lag = -4, idx = idx, na_pad = TRUE),
+    runner(x2, k = k, lag = -4, idx = idx, f = max2, na_pad = TRUE))
+
+
+  expect_equal(
+    max_run(x2, k = 4, lag = lag, idx = idx, na_pad = FALSE),
+    runner(x2, k = 4, lag = lag, idx = idx, f = max2, na_pad = FALSE))
+
+  expect_equal(
+    max_run(x2, k = 4, lag = lag, idx = idx, na_pad = TRUE),
+    runner(x2, k = 4, lag = lag, idx = idx, f = max2, na_pad = TRUE))
+})
+
+test_that("Errors", {
+  expect_error(max_run(x1, k = (1:999)), "length of k and length of x differs")
+  expect_error(max_run(x1, k = c(NA, k[-1])), "Function doesn't accept NA values in k vector")
+
+  expect_error(max_run(x1, lag = (1:99)), "length of lag and length of x differs")
+  expect_error(max_run(x1, lag = c(NA, lag[-1])), "Function doesn't accept NA values in lag vector")
+
+  expect_error(max_run(x1, idx = (1:99)), "length of idx and length of x differs")
+  expect_error(max_run(x1, idx = c(NA, 1:99)), "Function doesn't accept NA values in idx vector")
+})

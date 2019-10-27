@@ -1,94 +1,299 @@
 context("Running mean")
 set.seed(11)
-x1 <- rnorm(15)
-x2 <- sample(c(rep(NA,5),rnorm(15)), 15, replace=TRUE)
-k <- sample(1:15, 15, replace=TRUE)
-test_that("mean_run basic",{
-  for(i in 1:15)
-    expect_equal(
-      mean_run(x1)[i] ,
-      mean(x1[1:i])
-    )
+x1 <- sample(c(1, 2, 3), 100, replace = TRUE)
+x2 <- sample(c(NA, 1, 2, 3), 100, replace = TRUE)
+k <- sample(1:100, 100, replace = TRUE)
+lag <- sample(-15:15, 100, replace = TRUE)
+idx <- cumsum(sample(c(1, 2, 3, 4), 100, replace = TRUE))
+mean2 <- function(x) {
+  if (all(is.na(x))) return(NA) else mean(x, na.rm = TRUE)
+}
+
+test_that("       |--------]------->", {
+  expect_identical(
+    mean_run(x2),
+    runner(x2, f = mean2)
+  )
+
+  expect_identical(
+    mean_run(x2, na_pad = TRUE),
+    runner(x2, f = mean2, na_pad = TRUE)
+  )
 })
 
-test_that("mean_run with na_rm=T", {
-  for(i in 1:15)
-    expect_equal(
-      mean_run(x2, na_rm = T)[i] ,
-      mean(x2[1:i], na.rm=T)
-    )
+test_that("   [...|----]---+------->", {
+  expect_equal(
+    mean_run(x2, lag = 3),
+    runner(x2, lag = 3, f = mean2))
+
+  expect_equal(
+    mean_run(x2, lag = 3, na_pad = TRUE),
+    runner(x2, lag = 3, f = mean2, na_pad = TRUE))
 })
 
-test_that("mean_run with na_rm=F na_fill=T", {
-  for(i in 1:15)
-    expect_equal(
-      mean_run(x2, na_rm = F )[i] ,
-      mean(x2[1:i], na.rm = F)
-    )
+test_that("       |--------+---]--->", {
+  expect_equal(
+    mean_run(x2, lag = -3),
+    runner(x2, lag = -3, f = mean2))
+
+  expect_equal(
+    mean_run(x2, lag = -3, na_pad = TRUE),
+    runner(x2, lag = -3, f = mean2, na_pad = TRUE))
 })
 
-test_that("mean_run with na_rm=T", {
-  for(i in 1:15)
-    expect_equal(
-      mean_run(x2, na_rm = T )[i] ,
-      mean(x2[1:i] , na.rm = T)
-    )
+test_that("  [...]|--------+------->", {
+  expect_equal(
+    mean_run(x2, lag = 100),
+    runner(x2, lag = 100, f = mean2))
+
+  expect_equal(
+    mean_run(x2, lag = 100, na_pad = TRUE),
+    runner(x2, lag = 100, f = mean2, na_pad = TRUE))
+
+
+  expect_equal(
+    mean_run(x2, lag = -100),
+    runner(x2, lag = -100, f = mean2))
+
+  expect_equal(
+    mean_run(x2, lag = -100, na_pad = TRUE),
+    runner(x2, lag = -100, f = mean2, na_pad = TRUE))
 })
 
+test_that("       |----[...]------->", {
+  expect_equal(
+    mean_run(x2, k = 3),
+    runner(x2, k = 3, f = mean2))
 
-test_that("mean_run with na_rm=T k=4", {
-  for(i in 1:15)
-    expect_equal(
-      mean_run(x2, na_rm = T, k=4)[i] ,
-      mean(x2[pmax(i-4+1,1):i], na.rm=T)
-    )
-})
-
-
-test_that("sum_run with na_rm=T varying k", {
-  for(i in 1:15)
-    expect_equal(
-      mean_run(x2, na_rm = T, k=k)[i] ,
-      as.numeric( ifelse(all(is.na(x2[pmax(i-k[i]+1,1):i])),NA, mean(x2[pmax(i-k[i]+1,1):i], na.rm=T)))
-    )
-})
-
-
-test_that("mean_run with idx++ same as mean_run with windows",{
-  expect_identical( mean_run(x1,k=3) , mean_run(x1,k=3, idx=1:15) )
-  expect_identical( mean_run(x1,k=k) , mean_run(x1,k=k, idx=1:15) )
-})
-
-test_that("mean_run with idx",{
-  x11 <- rep(NA, 15)
-  x22 <- rep(NA, 15)
-  idx <- cumsum(sample(c(1,2,3,4), 15, replace=T))
-
-  for(i in 1:15)
-    for(j in i:1)
-      if(idx[j] >= (idx[i]-2)){
-        x11[i] <- mean(x1[j:i])
-      } else {
-        break;
-      }
-
-
-  for(i in 1:15)
-    for(j in i:1)
-      if(idx[j] >= (idx[i]-(k[i]-1))){
-        x22[i] <- mean(x1[j:i])
-      } else {
-        break;
-      }
-
-  expect_equal(mean_run(x1, k=3, idx=idx), x11)
-  expect_equal(mean_run(x1, k=k, idx=idx), x22)
+  expect_equal(
+    mean_run(x2, k = 3, na_pad = TRUE),
+    runner(x2, k = 3, f = mean2, na_pad = TRUE))
 
 })
 
+test_that("       [...|--------+-------[...]", {
+  expect_equal(
+    mean_run(x2, k = 1),
+    runner(x2, k = 1, f = mean2))
 
-test_that("Error handling in mean_run",{
-  expect_error(mean_run(x2, k=c(2,2,2,2,NA)))
-  expect_error(mean_run(x2, k=c(2,2,2,2,2,2)))
+  expect_equal(
+    mean_run(x2, k = 1, na_pad = TRUE),
+    runner(x2, k = 1, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, k = 99),
+    runner(x2, k = 99, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 99, na_pad = TRUE),
+    runner(x2, k = 99, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, k = 100),
+    runner(x2, k = 100, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 100, na_pad = TRUE),
+    runner(x2, k = 100, f = mean2, na_pad = TRUE))
 })
 
+test_that("       [...|----]---+------->", {
+  expect_equal(
+    mean_run(x2, k = 5, lag = 3),
+    runner(x2, k = 5, lag = 3, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 5, lag = 3, na_pad = TRUE),
+    runner(x2, k = 5, lag = 3, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, k = 5, lag = 3, na_rm = FALSE),
+    runner(x2, k = 5, lag = 3, f = mean))
+
+  expect_equal(
+    mean_run(x2, k = 5, lag = 3, na_pad = TRUE, na_rm = FALSE),
+    runner(x2, k = 5, lag = 3, f = mean, na_pad = TRUE))
+})
+
+test_that("       |-----[--+---]--->", {
+  expect_equal(
+    mean_run(x2, k = 5, lag = -3),
+    runner(x2, k = 5, lag = -3, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 5, lag = -3, na_pad = TRUE),
+    runner(x2, k = 5, lag = -3, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, k = 5, lag = -3, na_rm = FALSE),
+    runner(x2, k = 5, lag = -3, f = mean))
+
+  expect_equal(
+    mean_run(x2, k = 5, lag = -3, na_pad = TRUE, na_rm = FALSE),
+    runner(x2, k = 5, lag = -3, f = mean, na_pad = TRUE))
+})
+
+test_that("       |--------+-[---]->", {
+  expect_equal(
+    mean_run(x2, k = 5, lag = -7),
+    runner(x2, k = 5, lag = -7, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 5, lag = -7, na_pad = TRUE),
+    runner(x2, k = 5, lag = -7, f = mean2, na_pad = TRUE))
+
+})
+
+test_that("       |--------+[]----->", {
+  expect_equal(
+    mean_run(x2, k = 1, lag = -1),
+    runner(x2, k = 1, lag = -1, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 1, lag = -1, na_pad = TRUE),
+    runner(x2, k = 1, lag = -1, f = mean2, na_pad = TRUE))
+})
+
+test_that("       |------[]+------->", {
+  expect_equal(
+    mean_run(x2, k = 1, lag = 1),
+    runner(x2, k = 1, lag = 1, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 1, lag = 1, na_pad = TRUE),
+    runner(x2, k = 1, lag = 1, f = mean2, na_pad = TRUE))
+})
+
+test_that("various", {
+  expect_equal(
+    mean_run(x2, k = k, lag = 1),
+    runner(x2, k = k, lag = 1, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = k, lag = 1, na_pad = TRUE),
+    runner(x2, k = k, lag = 1, f = mean2, na_pad = TRUE))
+
+
+  expect_equal(
+    mean_run(x2, k = 3, lag = lag),
+    runner(x2, k = 3, lag = lag, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = 3, lag = lag, na_pad = TRUE),
+    runner(x2, k = 3, lag = lag, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, k = k, lag = lag),
+    runner(x2, k = k, lag = lag, f = mean2))
+
+  expect_equal(
+    mean_run(x2, k = k, lag = lag, na_pad = TRUE),
+    runner(x2, k = k, lag = lag, f = mean2, na_pad = TRUE))
+
+})
+
+test_that("date window", {
+  expect_equal(
+    mean_run(x2, lag = 3, idx = idx, na_pad = FALSE),
+    runner(x2, lag = 3, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, lag = 3, idx = idx, na_pad = TRUE),
+    runner(x2, lag = 3, idx = idx, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, lag = -3, idx = idx, na_pad = FALSE),
+    runner(x2, lag = -3, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, lag = -3, idx = idx, na_pad = TRUE),
+    runner(x2, lag = -3, idx = idx, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, k = 3, idx = idx, na_pad = FALSE),
+    runner(x2, k = 3, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, k = 3, idx = idx, na_pad = TRUE),
+    runner(x2, k = 3, idx = idx, f = mean2, na_pad = TRUE))
+
+
+  expect_equal(
+    mean_run(x2, lag = -1, idx = idx, na_pad = FALSE),
+    runner(x2, lag = -1, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, lag = -1, idx = idx, na_pad = TRUE),
+    runner(x2, lag = -1, idx = idx, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, lag = 100, idx = idx, na_pad = FALSE),
+    runner(x2, lag = 100, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, lag = 100, idx = idx, na_pad = TRUE),
+    runner(x2, lag = 100, idx = idx, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, lag = -100, idx = idx, na_pad = FALSE),
+    runner(x2, lag = -100, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, lag = -100, idx = idx, na_pad = TRUE),
+    runner(x2, lag = -100, idx = idx, f = mean2, na_pad = TRUE))
+
+
+  expect_equal(
+    mean_run(x2, lag = lag, idx = idx, na_pad = FALSE),
+    runner(x2, lag = lag, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, lag = lag, idx = idx, na_pad = TRUE),
+    runner(x2, lag = lag, idx = idx, f = mean2, na_pad = TRUE))
+
+  expect_equal(
+    mean_run(x2, k = 3, lag = 4, idx = idx, na_pad = FALSE),
+    runner(x2, k = 3, lag = 4, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, k = 3, lag = 4, idx = idx, na_pad = TRUE),
+    runner(x2, k = 3, lag = 4, idx = idx, f = mean2, na_pad = TRUE))
+
+
+  expect_equal(
+    mean_run(x2, k = 3, lag = -4, idx = idx, na_pad = FALSE),
+    runner(x2, k = 3, lag = -4, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, k = 3, lag = -4, idx = idx, na_pad = TRUE),
+    runner(x2, k = 3, lag = -4, idx = idx, f = mean2, na_pad = TRUE))
+
+
+  expect_equal(
+    mean_run(x2, k = k, lag = -4, idx = idx, na_pad = FALSE),
+    runner(x2, k = k, lag = -4, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, k = k, lag = -4, idx = idx, na_pad = TRUE),
+    runner(x2, k = k, lag = -4, idx = idx, f = mean2, na_pad = TRUE))
+
+
+  expect_equal(
+    mean_run(x2, k = 4, lag = lag, idx = idx, na_pad = FALSE),
+    runner(x2, k = 4, lag = lag, idx = idx, f = mean2, na_pad = FALSE))
+
+  expect_equal(
+    mean_run(x2, k = 4, lag = lag, idx = idx, na_pad = TRUE),
+    runner(x2, k = 4, lag = lag, idx = idx, f = mean2, na_pad = TRUE))
+})
+
+test_that("Errors", {
+  expect_error(mean_run(x1, k = (1:999)), "length of k and length of x differs")
+  expect_error(mean_run(x1, k = c(NA, k[-1])), "Function doesn't accept NA values in k vector")
+
+  expect_error(mean_run(x1, lag = (1:99)), "length of lag and length of x differs")
+  expect_error(mean_run(x1, lag = c(NA, lag[-1])), "Function doesn't accept NA values in lag vector")
+
+  expect_error(mean_run(x1, idx = (1:99)), "length of idx and length of x differs")
+  expect_error(mean_run(x1, idx = c(NA, 1:99)), "Function doesn't accept NA values in idx vector")
+})

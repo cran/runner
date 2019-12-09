@@ -5,7 +5,7 @@
 \title{Custom running function}
 \usage{
 runner(x, f, k = integer(1), lag = integer(1), idx = integer(0),
-  na_pad = FALSE)
+  na_pad = FALSE, type = "numeric")
 }
 \arguments{
 \item{x}{Vector of any type}
@@ -16,15 +16,18 @@ runner(x, f, k = integer(1), lag = integer(1), idx = integer(0),
 value then window size is constant for all elements, otherwise if \code{length(k) == length(x)} different
 window size for each element.}
 
-\item{lag}{\code{integer} vector or single value denoting window lag. If \code{lag} is a single
-value then window lag is constant for all elements, otherwise if \code{length(lag) == length(x)} different
-window size for each element.}
+\item{lag}{\code{integer} vector or single value denoting window lag.
+If \code{lag} is a single value then window lag is constant for all elements,
+otherwise if \code{length(lag) == length(x)} different window size for each
+element. Negative value shifts window forward.}
 
 \item{idx}{\code{date or integer} an optional integer vector containing index of observation. If specified
 then \code{k} and \code{lag} are depending on \code{idx}. Length of \code{idx} should be equal of length \code{x}}
 
 \item{na_pad}{\code{logical} single value (default \code{na_pad=FALSE}) - if \code{TRUE} calculation on
 incomplete window will return \code{NA}. Incomplete window is when some parts of the window are out of range}
+
+\item{type}{output type ("logical", "numeric", "integer", "character")}
 }
 \description{
 Applies custom function to running windows
@@ -35,4 +38,9 @@ runner(1:10, k = 3, f = function(x) mean(x, na.rm = TRUE))
 runner(letters[1:10],
        k = c(1, 2, 2, 4, 5, 5, 5, 5, 5, 5),
        f = function(x) length(unique(x)))
+
+runner(letters[1:10],
+       k = c(1, 2, 2, 4, 5, 5, 5, 5, 5, 5),
+       f = function(x) paste(x, collapse = "-"),
+       type = "character")
 }

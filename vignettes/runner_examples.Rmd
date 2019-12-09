@@ -7,8 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The most fundamental function in `runner` package is `runner`. With `runner::runner` one can apply any R function on running windows.
-This tutorial presents set of examples expaining how to tackle some tasks. Some of the examples are referenced to original topic on [stackoverflow](https://stackoverflow.com).
+The most fundamental function in `runner` package is `runner`. With `runner::runner`
+one can apply any R function on running windows. This tutorial presents set of 
+examples explaining how to tackle some tasks. Some of the examples are referenced 
+to original topic on [stack-overflow](https://stackoverflow.com).
 
 ![](images/using_runner.png)
 
@@ -93,6 +95,7 @@ df <- read.table(text = "  user_id       date category
        11 2016-01-16    apple", header = TRUE)
 
 df %>%
+  group_by(user_id) %>%
   mutate(
     distinct_7  = runner(category, k =  7, idx = date, f = function(x) length(unique(x))),
     distinct_14 = runner(category, k = 14, idx = date, f = function(x) length(unique(x)))

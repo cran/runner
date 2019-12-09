@@ -1,8 +1,8 @@
-## ----gh-installation, eval=FALSE-----------------------------------------
+## ----gh-installation, eval=FALSE----------------------------------------------
 #  # devtools::install_github("gogonzo/runner")
 #  install.packages("runner")
 
-## ---- echo=TRUE----------------------------------------------------------
+## ---- echo=TRUE---------------------------------------------------------------
 library(runner)
 x <- runif(15)
 k <- sample(1:15, 15, replace = TRUE)

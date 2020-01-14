@@ -1,4 +1,4 @@
-context("Running min")
+context("Running which")
 set.seed(11)
 x1 <- sample(c(T, F), 100, replace = TRUE)
 x2 <- sample(c(NA, T, F), 100, replace = TRUE)
@@ -40,6 +40,28 @@ test_that("       |--------]------->", {
   expect_identical(
     which_run(x2, na_pad = TRUE),
     as.integer(runner(x2, f = which2, na_pad = TRUE))
+  )
+
+
+  expect_identical(
+    which_run(x2, which = "first"),
+    as.integer(runner(x2, function(x) which2(x, arg_which = "first")))
+  )
+
+  expect_identical(
+    which_run(x2, which = "first", na_pad = TRUE),
+    as.integer(runner(x2, function(x) which2(x, arg_which = "first"), na_pad = TRUE))
+  )
+
+  expect_identical(
+    which_run(x1, na_rm = FALSE),
+    as.integer(runner(x1, function(x) which2(x, na_rm = FALSE)))
+  )
+
+
+  expect_identical(
+    which_run(x1, which = "first", na_rm = FALSE),
+    as.integer(runner(x1, function(x) which2(x, arg_which = "first", na_rm = FALSE)))
   )
 })
 
@@ -229,6 +251,7 @@ test_that("idx", {
 })
 
 test_that("Errors", {
+  expect_error(which_run(x1, which = "any"), "which value should be either")
   expect_error(which_run(x1, k = (1:999)), "length of k and length of x differs")
   expect_error(which_run(x1, k = c(NA, k[-1])), "Function doesn't accept NA values in k vector")
 

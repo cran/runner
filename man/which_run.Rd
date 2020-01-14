@@ -4,20 +4,39 @@
 \alias{which_run}
 \title{Running which}
 \usage{
-which_run(x, k = integer(1), lag = integer(1), which = "last",
-  na_rm = TRUE, na_pad = FALSE, idx = integer(0))
+which_run(
+  x,
+  k = integer(0),
+  lag = integer(1),
+  idx = integer(0),
+  at = integer(0),
+  which = "last",
+  na_rm = TRUE,
+  na_pad = FALSE
+)
 }
 \arguments{
 \item{x}{Vector of any type}
 
-\item{k}{\code{integer} vector or single value denoting size of the running window. If \code{k} is a single
-value then window size is constant for all elements, otherwise if \code{length(k) == length(x)} different
-window size for each element.}
+\item{k}{\code{integer} vector or single value denoting size of the running
+window. If \code{k} is a single value then window size is constant for all
+elements, otherwise if \code{length(k) == length(x)} different window size
+for each element.}
 
 \item{lag}{\code{integer} vector or single value denoting window lag.
 If \code{lag} is a single value then window lag is constant for all elements,
 otherwise if \code{length(lag) == length(x)} different window size for each
 element. Negative value shifts window forward.}
+
+\item{idx}{\code{date or integer} an optional integer vector containing
+index of observation. If specified
+then \code{k} and \code{lag} are depending on \code{idx}. Length of
+\code{idx} should be equal of length \code{x}}
+
+\item{at}{\code{date or integer} vector of any size and any value
+defining output data points. Values of the vector defines the indexes which
+data is computed at. If \code{idx} is missing then indexes are
+\code{seq_along(x)}, otherwise depends on indexes passed with \code{idx}.}
 
 \item{which}{\code{character} value "first" or "last" denoting if the first or last \code{TRUE}
 index is returned from the window.}
@@ -25,11 +44,9 @@ index is returned from the window.}
 \item{na_rm}{\code{logical} single value (default \code{na_rm = TRUE}) -
 if \code{TRUE} sum is calculating excluding \code{NA}.}
 
-\item{na_pad}{\code{logical} single value (default \code{na_pad=FALSE}) - if \code{TRUE} calculation on
-incomplete window will return \code{NA}. Incomplete window is when some parts of the window are out of range}
-
-\item{idx}{\code{date or integer} an optional integer vector containing index of observation. If specified
-then \code{k} and \code{lag} are depending on \code{idx}. Length of \code{idx} should be equal of length \code{x}}
+\item{na_pad}{\code{logical} single value (default \code{na_pad=FALSE}) - if
+\code{TRUE} calculation on incomplete window will return \code{NA}.
+Incomplete window is when some parts of the window are out of range}
 }
 \value{
 integer vector of indexes of the same length as \code{x}.

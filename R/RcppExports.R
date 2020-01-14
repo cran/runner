@@ -54,47 +54,95 @@ length_run <- function(k = integer(1), lag = integer(1), idx = integer(0)) {
     .Call('_runner_length_run', PACKAGE = 'runner', k, lag, idx)
 }
 
+#' Running min/max
+#'
+#'
+#' \code{min_run} calculates running minimum-maximum on given \code{x} numeric
+#'  vector, specified \code{k} window size.
+#' @inheritParams runner
+#' @inheritParams sum_run
+#' @param metric \code{character} what to return, minimum or maximum
+#' @return list.
+#' @export
+minmax_run <- function(x, metric = "min", na_rm = TRUE) {
+    .Call('_runner_minmax_run', PACKAGE = 'runner', x, metric, na_rm)
+}
+
 #' Custom running function
 #'
-#' Applies custom function to running windows
+#' Applies custom function on running windows.
 #' @param x Vector of any type
-#' @param k \code{integer} vector or single value denoting size of the running window. If \code{k} is a single
-#' value then window size is constant for all elements, otherwise if \code{length(k) == length(x)} different
-#' window size for each element.
-#' @param lag \code{integer} vector or single value denoting window lag.
+#' @param k (\code{integer}) vector or single value denoting size of the running
+#' window. If \code{k} is a single value then window size is constant for all
+#' elements, otherwise if \code{length(k) == length(x)} different window size
+#' for each element.
+#' @param lag (\code{integer}) vector or single value denoting window lag.
 #' If \code{lag} is a single value then window lag is constant for all elements,
 #' otherwise if \code{length(lag) == length(x)} different window size for each
 #' element. Negative value shifts window forward.
-#' @param idx \code{date or integer} an optional integer vector containing index of observation. If specified
-#' then \code{k} and \code{lag} are depending on \code{idx}. Length of \code{idx} should be equal of length \code{x}
-#' @param f \code{function} to be applied on \code{x}
-#' @param na_pad \code{logical} single value (default \code{na_pad=FALSE}) - if \code{TRUE} calculation on
-#' incomplete window will return \code{NA}. Incomplete window is when some parts of the window are out of range
-#' @param type output type ("logical", "numeric", "integer", "character")
+#' @param idx (\code{date or integer}) an optional integer vector containing
+#' index of observation. If specified
+#' then \code{k} and \code{lag} are depending on \code{idx}. Length of
+#' \code{idx} should be equal of length \code{x}
+#' @param f \code{function} to be applied on windows created from \code{x}
+#' @param at (\code{date or integer}) vector of any size and any value
+#' defining output data points. Values of the vector defines the indexes which
+#' data is computed at. If \code{idx} is missing then uses indices from \code{1}
+#'  to \code{length(x)}, otherwise depends on indexes passed with \code{idx}.
+#'  If \code{at} is defined then \code{k} and \code{lag} should be of length equal
+#'  one or length of the \code{at}.
+#' @param na_pad \code{logical} single value (default \code{na_pad=FALSE}) - if
+#'  \code{TRUE} calculation on incomplete window will return \code{NA}.
+#'  Incomplete window is when some parts of the window are out of range
+#' @param type output type \code{("logical", "numeric", "integer", "character")}.
+#'  \code{runner} by default returns numeric values, but if function is expected
+#'  to return other type, user should specify this in \code{type} argument.
+#'
+#' @return vector with aggregated values for each window. Length of output is the
+#' same as \code{length(x)} or \code{length(at)} if specified. Type of the output
+#' is taken from \code{type} argument.
 #' @examples
+#'
+#' # mean on k = 3 elements windows
 #' runner(1:10, f = mean, k = 3)
+#'
+#' # mean on k = 3 elements windows with different specification
 #' runner(1:10, k = 3, f = function(x) mean(x, na.rm = TRUE))
+#'
+#' # number of unique values in each window (varying window size)
 #' runner(letters[1:10],
 #'        k = c(1, 2, 2, 4, 5, 5, 5, 5, 5, 5),
 #'        f = function(x) length(unique(x)))
 #'
+#' # concatenate window values
 #' runner(letters[1:10],
 #'        k = c(1, 2, 2, 4, 5, 5, 5, 5, 5, 5),
 #'        f = function(x) paste(x, collapse = "-"),
 #'        type = "character")
+#'
+#' # concatenate only on selected windows index
+#' runner(letters[1:10],
+#'        f = function(x) paste(x, collapse = "-"),
+#'        at = c(1, 5, 8),
+#'        type = "character")
+#'
 #' @export
-runner <- function(x, f, k = integer(1), lag = integer(1), idx = integer(0), na_pad = FALSE, type = "numeric") {
-    .Call('_runner_runner', PACKAGE = 'runner', x, f, k, lag, idx, na_pad, type)
+runner <- function(x, f, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), na_pad = FALSE, type = "numeric") {
+    .Call('_runner_runner', PACKAGE = 'runner', x, f, k, lag, idx, at, na_pad, type)
 }
 
 #' Running sum
 #'
 #' Running sum in specified window of numeric vector.
 #' @inheritParams runner
+#'
 #' @param x \code{numeric} vector which running function is calculated on
+#'
 #' @param na_rm \code{logical} single value (default \code{na_rm = TRUE}) -
 #' if \code{TRUE} sum is calculating excluding \code{NA}.
+#'
 #' @inheritParams runner
+#'
 #' @return sum \code{code} vector of length equals length of \code{x}.
 #' @examples
 #' set.seed(11)
@@ -106,8 +154,8 @@ runner <- function(x, f, k = integer(1), lag = integer(1), idx = integer(0), na_
 #' sum_run(x2, na_rm = FALSE)
 #' sum_run(x2, na_rm = TRUE, k = 4)
 #' @export
-sum_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad = FALSE, idx = integer(0)) {
-    .Call('_runner_sum_run', PACKAGE = 'runner', x, k, lag, na_rm, na_pad, idx)
+sum_run <- function(x, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), na_rm = TRUE, na_pad = FALSE) {
+    .Call('_runner_sum_run', PACKAGE = 'runner', x, k, lag, idx, at, na_rm, na_pad)
 }
 
 #' Running mean
@@ -126,8 +174,8 @@ sum_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad = 
 #' mean_run(x2, na_rm = FALSE )
 #' mean_run(x2, na_rm = TRUE, k=4)
 #' @export
-mean_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad = FALSE, idx = integer(0)) {
-    .Call('_runner_mean_run', PACKAGE = 'runner', x, k, lag, na_rm, na_pad, idx)
+mean_run <- function(x, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), na_rm = TRUE, na_pad = FALSE) {
+    .Call('_runner_mean_run', PACKAGE = 'runner', x, k, lag, idx, at, na_rm, na_pad)
 }
 
 #' Running maximum
@@ -148,8 +196,8 @@ mean_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad =
 #' max_run(x2, na_rm = TRUE, k=4) # maximum in 4-element window
 #' max_run(x2, na_rm = FALSE, k=k) # maximum in varying k window size
 #' @export
-max_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad = FALSE, idx = integer(0)) {
-    .Call('_runner_max_run', PACKAGE = 'runner', x, k, lag, na_rm, na_pad, idx)
+max_run <- function(x, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), na_rm = TRUE, na_pad = FALSE) {
+    .Call('_runner_max_run', PACKAGE = 'runner', x, k, lag, idx, at, na_rm, na_pad)
 }
 
 #' Running minimum
@@ -169,22 +217,30 @@ max_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad = 
 #' min_run(x2, na_rm = TRUE, k = 4)
 #' min_run(x2, na_rm = FALSE, k = k)
 #' @export
-min_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad = FALSE, idx = integer(0)) {
-    .Call('_runner_min_run', PACKAGE = 'runner', x, k, lag, na_rm, na_pad, idx)
+min_run <- function(x, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), na_rm = TRUE, na_pad = FALSE) {
+    .Call('_runner_min_run', PACKAGE = 'runner', x, k, lag, idx, at, na_rm, na_pad)
 }
 
-#' Running min/max
+#' Running streak length
 #'
-#'
-#' \code{min_run} calculates running minimum-maximum on given \code{x} numeric
-#'  vector, specified \code{k} window size.
+#' Calculates running series of consecutive elements
+#' @param x {any type} vector which running function is calculated on
 #' @inheritParams runner
 #' @inheritParams sum_run
-#' @param metric \code{character} what to return, minimum or maximum
-#' @return list.
+#' @return streak [numeric] vector of length equals length of \code{x} containing
+#' number of consecutive occurrences.
+#' @examples
+#' set.seed(11)
+#' x1 <- sample(c("a","b"), 15, replace = TRUE)
+#' x2 <- sample(c(NA_character_, "a", "b"), 15, replace = TRUE)
+#' k <- sample(1:4, 15, replace = TRUE)
+#' streak_run(x1) # simple streak run
+#' streak_run(x1, k = 2) # streak run within 2-element window
+#' streak_run(x2, na_pad = TRUE, k = 3) # streak run within k=3 with padding NA
+#' streak_run(x1, k = k) # streak run within varying window size specified by vector k
 #' @export
-minmax_run <- function(x, metric = "min", na_rm = TRUE) {
-    .Call('_runner_minmax_run', PACKAGE = 'runner', x, metric, na_rm)
+streak_run <- function(x, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), na_rm = TRUE, na_pad = FALSE) {
+    .Call('_runner_streak_run', PACKAGE = 'runner', x, k, lag, idx, at, na_rm, na_pad)
 }
 
 #' Running which
@@ -206,41 +262,23 @@ minmax_run <- function(x, metric = "min", na_rm = TRUE) {
 #' which_run(x2, na_rm = TRUE, k = 4)
 #' which_run(x2, na_rm = FALSE, k = k)
 #' @export
-which_run <- function(x, k = integer(1), lag = integer(1), which = "last", na_rm = TRUE, na_pad = FALSE, idx = integer(0)) {
-    .Call('_runner_which_run', PACKAGE = 'runner', x, k, lag, which, na_rm, na_pad, idx)
-}
-
-#' Running streak length
-#'
-#' Calculates running series of consecutive elements
-#' @param x {any type} vector which running function is calculated on
-#' @inheritParams runner
-#' @inheritParams sum_run
-#' @return streak [numeric] vector of length equals length of \code{x} containing
-#' number of consecutive occurrences.
-#' @examples
-#' set.seed(11)
-#' x1 <- sample(c("a","b"), 15, replace = TRUE)
-#' x2 <- sample(c(NA_character_, "a", "b"), 15, replace = TRUE)
-#' k <- sample(1:4, 15, replace = TRUE)
-#' streak_run(x1) # simple streak run
-#' streak_run(x1, k = 2) # streak run within 2-element window
-#' streak_run(x2, na_pad = TRUE, k = 3) # streak run within k=3 with padding NA
-#' streak_run(x1, k = k) # streak run within varying window size specified by vector k
-#' @export
-streak_run <- function(x, k = integer(1), lag = integer(1), na_rm = TRUE, na_pad = FALSE, idx = integer(0)) {
-    .Call('_runner_streak_run', PACKAGE = 'runner', x, k, lag, na_rm, na_pad, idx)
+which_run <- function(x, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), which = "last", na_rm = TRUE, na_pad = FALSE) {
+    .Call('_runner_which_run', PACKAGE = 'runner', x, k, lag, idx, at, which, na_rm, na_pad)
 }
 
 #' List of running windows
 #'
-#' Creates list of windows
+#' Creates \code{list} of windows with given arguments settings.
+#' Length of output \code{list} is equal
 #' @inheritParams runner
+#' @return list of vectors (windows). Length of list is the same as
+#' \code{length(x)} or \code{length(at)} if specified, and length of each
+#'  window is defined by \code{k} (unless window is out of range).
 #' @examples
 #' window_run(1:10, k = 3, lag = -1)
 #' window_run(letters[1:10], k = c(1, 2, 2, 4, 5, 5, 5, 5, 5, 5))
 #' @export
-window_run <- function(x, k = integer(1), lag = integer(1), idx = integer(0), na_pad = FALSE) {
-    .Call('_runner_window_run', PACKAGE = 'runner', x, k, lag, idx, na_pad)
+window_run <- function(x, k = integer(0), lag = integer(1), idx = integer(0), at = integer(0), na_pad = FALSE) {
+    .Call('_runner_window_run', PACKAGE = 'runner', x, k, lag, idx, at, na_pad)
 }
 

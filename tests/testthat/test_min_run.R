@@ -5,8 +5,8 @@ x2 <- sample(c(NA, 1, 2, 3), 100, replace = TRUE)
 k <- sample(1:100, 100, replace = TRUE)
 lag <- sample(-15:15, 100, replace = TRUE)
 idx <- cumsum(sample(c(1, 2, 3, 4), 100, replace = TRUE))
-min2 <- function(x) {
-  if (all(is.na(x))) return(NA) else min(x, na.rm = TRUE)
+min2 <- function(x, na_rm = TRUE) {
+  if (all(is.na(x))) return(NA) else min(x, na.rm = na_rm)
 }
 
 test_that("       |--------]------->", {
@@ -18,6 +18,11 @@ test_that("       |--------]------->", {
   expect_identical(
     min_run(x2, na_pad = TRUE),
     runner(x2, f = min2, na_pad = TRUE)
+  )
+
+  expect_identical(
+    min_run(x2, na_rm = FALSE),
+    runner(x2, function(x) min2(x, na_rm = FALSE))
   )
 })
 
@@ -285,15 +290,4 @@ test_that("date window", {
   expect_equal(
     min_run(x2, k = 4, lag = lag, idx = idx, na_pad = TRUE),
     runner(x2, k = 4, lag = lag, idx = idx, f = min2, na_pad = TRUE))
-})
-
-test_that("Errors", {
-  expect_error(min_run(x1, k = (1:999)), "length of k and length of x differs")
-  expect_error(min_run(x1, k = c(NA, k[-1])), "Function doesn't accept NA values in k vector")
-
-  expect_error(min_run(x1, lag = (1:99)), "length of lag and length of x differs")
-  expect_error(min_run(x1, lag = c(NA, lag[-1])), "Function doesn't accept NA values in lag vector")
-
-  expect_error(min_run(x1, idx = (1:99)), "length of idx and length of x differs")
-  expect_error(min_run(x1, idx = c(NA, 1:99)), "Function doesn't accept NA values in idx vector")
 })

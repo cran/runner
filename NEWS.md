@@ -1,4 +1,8 @@
-# 0.3.0
+# runner 0.3.1
+
+* added `at` argument to all functions to return output with specific indexes.
+
+# runner 0.3.0
 
 * switch to c++11 compiler
 * fix lag to get latest value within window instead of outside of the window

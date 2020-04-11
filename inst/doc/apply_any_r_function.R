@@ -1,42 +1,143 @@
 ## ----eval=FALSE---------------------------------------------------------------
-#  library(runner)
-#  x <- rnorm(20)
-#  dates <- seq.Date(Sys.Date(), Sys.Date() + 19, by = "1 day")
+#  # full windows
+#  runner(1:15)
 #  
-#  runner(x,
-#         k = 14,
-#         idx = dates,
-#         f = function(xi) {
-#          mean(xi, na.rm = TRUE, trim = 0.05)
-#         })
+#  # summarizing - sum
+#  runner(
+#    1:15,
+#    f = sum
+#  )
+#  
+#  # summarizing - concatenating
+#  runner(
+#    letters[1:15],
+#    f = paste,
+#    collapse = " > "
+#  )
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  runner::runner(x = 1:15,
-#                 k = 4,
-#                 f = function(x) mean(x))
-
-## ----eval=FALSE---------------------------------------------------------------
-#  runner::runner(x = 1:15,
-#                 k = 4,
-#                 lag = 2,
-#                 f = function(x) mean(x))
+#  # summarizing - sum of 4-elements
+#  runner(
+#    1:15,
+#    k = 4,
+#    f = sum
+#  )
+#  
+#  # summarizing - slope from lm
+#  runner(
+#    x = data.frame(
+#      a = 1:15,
+#      b = 3 * 1:15 + rnorm(15)
+#    ),
+#    k = 5,
+#    f = function(x) {
+#      model <- lm(b ~ a, data = x)
+#      coefficients(model)["a"]
+#    }
+#  )
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  idx <- c(4, 6, 7, 13, 17, 18, 18, 21, 27, 31, 37, 42, 44, 47, 48)
-#  runner::runner(x = 1:15,
-#                 k = 5,
-#                 lag = 1,
-#                 idx = idx,
-#                 f = function(x) mean(x))
+#  
+#  # summarize - mean
+#  runner::runner(
+#    x = idx,
+#    k = 5, # 5-days window
+#    lag = 1,
+#    idx = idx,
+#    f = function(x) mean(x)
+#  )
+#  
+#  
+#  # use Date or datetime sequences
+#  runner::runner(
+#    x = idx,
+#    k = "5 days", # 5-days window
+#    lag = 1,
+#    idx = Sys.Date() + idx,
+#    f = function(x) mean(x)
+#  )
+#  
+#  # obtain window from above illustration
+#  runner::runner(
+#    x = idx,
+#    k = "5 days",
+#    lag = 1,
+#    idx = Sys.Date() + idx
+#  )
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  idx <- c(4, 6, 7, 13, 17, 18, 18, 21, 27, 31, 37, 42, 44, 47, 48)
+#  
+#  # summary
 #  runner::runner(x = 1:15,
 #                 k = 5,
 #                 lag = 1,
 #                 idx = idx,
 #                 at = c(18, 27, 48, 31),
-#                 f = function(x) mean(x))
+#                 f = mean)
+#  
+#  # full window
+#  runner::runner(x = idx,
+#                 k = 5,
+#                 lag = 1,
+#                 idx = idx,
+#                 at = c(18, 27, 48, 31))
+
+## ----eval=FALSE---------------------------------------------------------------
+#  idx_date <- seq(Sys.Date(), Sys.Date() + 365, by = "1 month")
+#  
+#  # change interval to 4-months
+#  runner(
+#    x = 0:12,
+#    idx = idx_date,
+#    at = "4 months"
+#  )
+#  
+#  # calculate correlation at every 6-months
+#  runner(
+#    x = data.frame(
+#      a = 1:13,
+#      b = 1:13 + rnorm(13, sd = 5)
+#    ),
+#    idx = idx_date,
+#    at = "6 months",
+#    f = function(x) {
+#      cor(x$a, x$b)
+#    }
+#  )
+
+## ----eval=FALSE---------------------------------------------------------------
+#  # summarizing - concatenating
+#  runner::runner(
+#    x = 1:10,
+#    lag = c(-1, 2, -1, -2, 0, 0, 5, -5, -2, -3),
+#    k = c(0, 1, 1, 1, 1, 5, 5, 5, 5, 5),
+#    f = paste,
+#    collapse = ","
+#  )
+#  
+#  # full window
+#  runner::runner(
+#    x = 1:10,
+#    lag = 1,
+#    k = c(1, 1, 1, 1, 1, 5, 5, 5, 5, 5)
+#  )
+#  
+#  # on dates
+#  idx <- c(4, 6, 7, 13, 17, 18, 18, 21, 27, 31, 37, 42, 44, 47, 48)
+#  
+#  runner::runner(
+#    x = 1:15,
+#    lag = sample(c("-2 days", "-1 days", "1 days", "2 days"),
+#                 size = 15,
+#                 replace = TRUE),
+#    k = sample(c("5 days", "10 days", "15 days"),
+#               size = 15,
+#               replace = TRUE),
+#    idx = Sys.Date() + idx,
+#    f = function(x) mean(x)
+#  )
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  idx <- c(4, 6, 7, 13, 17, 18, 18, 21, 27, 31, 37, 42, 44, 47, 48)

@@ -1,7 +1,7 @@
 Package: runner
 Title: Running Operations for Vectors
 Type: Package
-Version: 0.3.5
+Version: 0.3.7
 Depends: R (>= 3.0)
 Language: en-US
 Encoding: UTF-8
@@ -21,7 +21,7 @@ Suggests: dplyr, knitr, magrittr, rmarkdown, spelling, testthat
 VignetteBuilder: knitr
 RoxygenNote: 7.1.0
 NeedsCompilation: yes
-Packaged: 2020-04-11 08:48:49 UTC; gonzo
+Packaged: 2020-05-16 10:30:58 UTC; gonzo
 Author: Dawid Kałędkowski [aut, cre] (<https://orcid.org/0000-0001-9533-457X>)
 Repository: CRAN
-Date/Publication: 2020-04-11 09:20:02 UTC
+Date/Publication: 2020-05-17 01:10:06 UTC

@@ -1,12 +1,12 @@
-
 # `runner` an R package for running operations.
 
 # <img src="man/figures/hexlogo.png" align="right" />
 
 <!-- badges: start -->
 
+[![Check and
+deploy](https://github.com/gogonzo/runner/workflows/Check%20and%20deploy/badge.svg)](https://github.com/gogonzo/runner/actions)
 [![](https://cranlogs.r-pkg.org/badges/runner)](https://CRAN.R-project.org/package=runner)
-[![](https://travis-ci.org/gogonzo/runner.svg?branch=master)](https://travis-ci.org/gogonzo/runner)
 [![](https://ci.appveyor.com/api/projects/status/github/gogonzo/runner?branch=master&svg=true)](https://ci.appveyor.com/project/gogonzo/runner)
 [![](https://codecov.io/gh/gogonzo/runner/branch/master/graph/badge.svg)](https://codecov.io/gh/gogonzo/runner/branch/master)
 <!-- badges: end -->
@@ -86,11 +86,11 @@ runner(1:15, k = 4)
 
 `lag` denotes how many observations windows will be lagged by. If `lag`
 is a single value than it is constant for all elements of x. For varying
-lag size one should specify `lag` as integer vector of `length(lag) ==
-length(x)` where each element of `lag` defines lag of window. Default
-value of `lag = 0`. Example below illustrates window of `k = 4` lagged
-by `lag = 2` for 10-th element of vector `x`. Lag can also be negative
-value, which shifts window forward instead of backward.
+lag size one should specify `lag` as integer vector of
+`length(lag) == length(x)` where each element of `lag` defines lag of
+window. Default value of `lag = 0`. Example below illustrates window of
+`k = 4` lagged by `lag = 2` for 10-th element of vector `x`. Lag can
+also be negative value, which shifts window forward instead of backward.
 
 ![](man/figures/laggedwindowklag.png)
 
@@ -112,8 +112,7 @@ same length as `x` of class `Date` or `integer`. Including `idx` can be
 combined with varying window size, than k will denote number of periods
 in window different for each data point. Example below illustrates
 window of size `k = 5` lagged by `lag = 2`. In parentheses ranges for
-each
-window.
+each window.
 
 ![](man/figures/runningdatewindows.png)
 
@@ -127,7 +126,7 @@ runner(
 )
 ```
 
-### running at
+### Running at
 
 Runner by default returns vector of the same size as `x` unless one puts
 any-size vector to `at` argument. Each element of `at` is an index on
@@ -203,10 +202,35 @@ plot(slope)
 abline(h = 30, col = "blue")
 ```
 
+### Parallel computation
+
+The `runner` function can also compute windows in parallel mode. The
+function doesn’t initialize the parallel cluster automatically but one
+have to do this outside and pass it to the `runner` through `cl`
+argument.
+
+``` r
+library(parallel)
+
+# 
+numCores <- detectCores()
+cl <- makeForkCluster(numCores)
+
+runner(
+  x = df,
+  k = 10,
+  idx = "date",
+  f = function(x) sum(x$x),
+  cl = cl
+)
+
+stopCluster(cl)
+```
+
 ### Build-in functions
 
 With `runner` one can use any R functions, but some of them are
 optimized for speed reasons. These functions are:  
-\- aggregating functions - `length_run`, `min_run`, `max_run`,
+- aggregating functions - `length_run`, `min_run`, `max_run`,
 `minmax_run`, `sum_run`, `mean_run`, `streak_run`  
-\- utility functions - `fill_run`, `lag_run`, `which_run`
+- utility functions - `fill_run`, `lag_run`, `which_run`

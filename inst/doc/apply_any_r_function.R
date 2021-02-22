@@ -1,4 +1,5 @@
 ## ----eval=FALSE---------------------------------------------------------------
+#  library(runner)
 #  # full windows
 #  runner(1:15)
 #  
@@ -179,7 +180,7 @@
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(dplyr)
 #  
-#  df <- df %>%
+#  summ <- df %>%
 #    group_by(group) %>%
 #    mutate(
 #      cumulative_mse = runner(
@@ -193,7 +194,7 @@
 #    )
 #  
 #  library(ggplot2)
-#  df %>%
+#  summ %>%
 #    ggplot(aes(x = date, y = cumulative_mse, group = group, color = group)) +
 #    geom_line()
 #  
@@ -226,4 +227,20 @@
 #    )
 #  
 #  
+
+## ----eval=FALSE---------------------------------------------------------------
+#  library(parallel)
+#  
+#  numCores <- detectCores()
+#  cl <- makeForkCluster(numCores)
+#  
+#  runner(
+#    x = df,
+#    k = 10,
+#    idx = "date",
+#    f = function(x) sum(x$x),
+#    cl = cl
+#  )
+#  
+#  stopCluster(cl)
 

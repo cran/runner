@@ -1,7 +1,7 @@
 Package: runner
 Title: Running Operations for Vectors
 Type: Package
-Version: 0.3.7
+Version: 0.3.8
 Depends: R (>= 3.0)
 Language: en-US
 Encoding: UTF-8
@@ -10,18 +10,19 @@ Authors@R: person("Dawid", "Kałędkowski",
                   comment = c(ORCID = "0000-0001-9533-457X"),
                   role = c("aut", "cre"))
 Maintainer: Dawid Kałędkowski <dawid.kaledkowski@gmail.com>
-Description: Fully supports rolling windows operations by controlling window length,
-  window lag, time indexing. With runner one can apply any R function on rolling
-  windows. Package eases work with equally and unequally spaced time series.
+Description: Lightweight library for rolling windows operations. Package enables
+  full control over the window length, window lag and a time indices. With a runner 
+  one can apply any R function on a rolling windows. The package eases work with 
+  equally and unequally spaced time series.
 License: GPL (>= 2)
 BugReports: https://github.com/gogonzo/runner/issues
 LinkingTo: Rcpp
-Imports: methods, Rcpp
-Suggests: dplyr, knitr, magrittr, rmarkdown, spelling, testthat
+Imports: methods, parallel, Rcpp
+Suggests: knitr, rmarkdown, tinytest
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0
 NeedsCompilation: yes
-Packaged: 2020-05-16 10:30:58 UTC; gonzo
+Packaged: 2021-02-21 19:05:15 UTC; gonzo
 Author: Dawid Kałędkowski [aut, cre] (<https://orcid.org/0000-0001-9533-457X>)
 Repository: CRAN
-Date/Publication: 2020-05-17 01:10:06 UTC
+Date/Publication: 2021-02-22 14:50:02 UTC

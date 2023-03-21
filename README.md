@@ -7,8 +7,6 @@
 
 [![Check](https://github.com/gogonzo/runner/workflows/Check/badge.svg)](https://github.com/gogonzo/runner/actions)
 [![](https://cranlogs.r-pkg.org/badges/runner)](https://CRAN.R-project.org/package=runner)
-[![](https://ci.appveyor.com/api/projects/status/github/gogonzo/runner?branch=master&svg=true)](https://ci.appveyor.com/project/gogonzo/runner)
-[![](https://codecov.io/gh/gogonzo/runner/branch/master/graph/badge.svg)](https://codecov.io/gh/gogonzo/runner/branch/master)
 [![Dependencies](https://tinyverse.netlify.com/badge/runner)](https://cran.r-project.org/package=runner)
 <!-- badges: end -->
 

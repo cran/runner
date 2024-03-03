@@ -138,11 +138,13 @@
 #  runner::runner(
 #    x = 1:15,
 #    lag = sample(c("-2 days", "-1 days", "1 days", "2 days"),
-#                 size = 15,
-#                 replace = TRUE),
+#      size = 15,
+#      replace = TRUE
+#    ),
 #    k = sample(c("5 days", "10 days", "15 days"),
-#               size = 15,
-#               replace = TRUE),
+#      size = 15,
+#      replace = TRUE
+#    ),
 #    idx = Sys.Date() + idx,
 #    f = function(x) mean(x)
 #  )
@@ -164,7 +166,7 @@
 #  x <- cumsum(rnorm(40))
 #  y <- 3 * x + rnorm(40)
 #  date <- Sys.Date() + cumsum(sample(1:3, 40, replace = TRUE)) # unequaly spaced time series
-#  group <-  rep(c("a", "b"), 20)
+#  group <- rep(c("a", "b"), 20)
 #  
 #  df <- data.frame(date, group, y, x)
 #  
@@ -197,7 +199,6 @@
 #  summ %>%
 #    ggplot(aes(x = date, y = cumulative_mse, group = group, color = group)) +
 #    geom_line()
-#  
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  df %>%
@@ -207,17 +208,15 @@
 #      cumulative_mse = runner(
 #        x = .,
 #        f = function(x) {
-#          mean((residuals(lm(y ~ x, data = x))) ^ 2)
+#          mean((residuals(lm(y ~ x, data = x)))^2)
 #        }
 #      ),
-#  
 #      intercept = runner(
 #        x = .,
 #        f = function(x) {
 #          coefficients(lm(y ~ x, data = x))[1]
 #        }
 #      ),
-#  
 #      slope = runner(
 #        x = .,
 #        f = function(x) {
@@ -225,8 +224,6 @@
 #        }
 #      )
 #    )
-#  
-#  
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  library(parallel)

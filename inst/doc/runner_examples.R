@@ -59,9 +59,12 @@
 #  set.seed(3737)
 #  df <- data.frame(
 #    user_id = c(rep(27, 7), rep(11, 7)),
-#    date = as.Date(rep(c('2016-01-01', '2016-01-03', '2016-01-05', '2016-01-07',
-#                         '2016-01-10', '2016-01-14', '2016-01-16'), 2)),
-#    value = round(rnorm(14, 15, 5), 1))
+#    date = as.Date(rep(c(
+#      "2016-01-01", "2016-01-03", "2016-01-05", "2016-01-07",
+#      "2016-01-10", "2016-01-14", "2016-01-16"
+#    ), 2)),
+#    value = round(rnorm(14, 15, 5), 1)
+#  )
 #  
 #  df %>%
 #    group_by(user_id) %>%
@@ -93,14 +96,16 @@
 #  df %>%
 #    group_by(user_id) %>%
 #    mutate(
-#      distinct_7  = runner(category,
-#                           k = "7 days",
-#                           idx = as.Date(date),
-#                           f = function(x) length(unique(x))),
+#      distinct_7 = runner(category,
+#        k = "7 days",
+#        idx = as.Date(date),
+#        f = function(x) length(unique(x))
+#      ),
 #      distinct_14 = runner(category,
-#                           k = "14 days",
-#                           idx = as.Date(date),
-#                           f = function(x) length(unique(x)))
+#        k = "14 days",
+#        idx = as.Date(date),
+#        f = function(x) length(unique(x))
+#      )
 #    )
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -109,7 +114,7 @@
 #  x <- cumsum(rnorm(20))
 #  y <- 3 * x + rnorm(20)
 #  date <- Sys.Date() + cumsum(sample(1:3, 20, replace = TRUE)) # unequaly spaced time series
-#  group <-  rep(c("a", "b"), each = 10)
+#  group <- rep(c("a", "b"), each = 10)
 #  
 #  
 #  data.frame(date, group, y, x) %>%
@@ -134,14 +139,16 @@
 #  library(runner)
 #  library(dplyr)
 #  
-#  Date <- seq(from = as.Date("2014-01-01"),
-#              to = as.Date("2019-12-31"),
-#              by = 'day')
+#  Date <- seq(
+#    from = as.Date("2014-01-01"),
+#    to = as.Date("2019-12-31"),
+#    by = "day"
+#  )
 #  market_return <- c(rnorm(2191))
 #  
 #  AAPL <- data.frame(
 #    Company.name = "AAPL",
-#    Date =  Date,
+#    Date = Date,
 #    market_return = market_return
 #  )
 #  
@@ -153,15 +160,17 @@
 #  
 #  df <- rbind(AAPL, MSFT)
 #  df$stock_return <- c(rnorm(4382))
-#  df <- df[order(df$Date),]
+#  df <- df[order(df$Date), ]
 #  
 #  df2 <- data.frame(
 #    Company.name2 = c(replicate(450, "AAPL"), replicate(450, "MSFT")),
 #    Event_date = sample(
-#      seq(as.Date('2015/01/01'),
-#          as.Date('2019/12/31'),
-#          by = "day"),
-#      size =  900)
+#      seq(as.Date("2015/01/01"),
+#        as.Date("2019/12/31"),
+#        by = "day"
+#      ),
+#      size = 900
+#    )
 #  )
 #  
 #  
@@ -169,7 +178,7 @@
 #    group_by(Company.name2) %>%
 #    mutate(
 #      intercept = runner(
-#        x = df[df$Company.name ==  Company.name2[1], ],
+#        x = df[df$Company.name == Company.name2[1], ],
 #        k = "180 days",
 #        lag = "5 days",
 #        idx = df$Date[df$Company.name == Company.name2[1]],

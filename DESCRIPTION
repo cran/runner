@@ -1,7 +1,7 @@
 Package: runner
 Title: Running Operations for Vectors
 Type: Package
-Version: 0.4.3
+Version: 0.4.4
 Depends: R (>= 3.0)
 Language: en-US
 Encoding: UTF-8
@@ -19,10 +19,10 @@ BugReports: https://github.com/gogonzo/runner/issues
 LinkingTo: Rcpp
 Imports: methods, parallel, Rcpp
 Suggests: knitr, rmarkdown, tinytest
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2023-03-21 06:10:05 UTC; gonzo
+Packaged: 2024-03-03 20:09:02 UTC; gonzo
 Author: Dawid Kałędkowski [aut, cre] (<https://orcid.org/0000-0001-9533-457X>)
 Repository: CRAN
-Date/Publication: 2023-03-21 06:40:02 UTC
+Date/Publication: 2024-03-03 20:50:02 UTC

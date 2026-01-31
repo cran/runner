@@ -1,14 +1,14 @@
 Package: runner
 Title: Running Operations for Vectors
 Type: Package
-Version: 0.4.5
+Version: 0.4.6
 Depends: R (>= 3.0)
 Language: en-US
 Encoding: UTF-8
 Authors@R: person("Dawid", "Kałędkowski", ,
                   email = "dawid.kaledkowski@gmail.com",
-                  comment = c(ORCID = "0000-0001-9533-457X"),
-                  role = c("aut", "cre"))
+                  role = c("aut", "cre"),
+                  comment = "ORCID: <https://orcid.org/0000-0001-9533-457X>")
 Maintainer: Dawid Kałędkowski <dawid.kaledkowski@gmail.com>
 Description: Lightweight library for rolling windows operations. Package enables
   full control over the window length, window lag and a time indices. With a runner 
@@ -22,8 +22,8 @@ Suggests: knitr, rmarkdown, tinytest
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2025-11-30 21:07:05 UTC; dawidkaledkowski
+Packaged: 2026-01-30 21:49:09 UTC; dawidkaledkowski
 Author: Dawid Kałędkowski [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-9533-457X>)
 Repository: CRAN
-Date/Publication: 2025-12-01 06:10:39 UTC
+Date/Publication: 2026-01-31 07:40:02 UTC
